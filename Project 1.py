@@ -1,10 +1,19 @@
 import nbformat
 import sys
+import markdown
+from bs4 import BeautifulSoup
+
+# In terminal: pip install markdown beautifulsoup4
 
 # HOW TO RUN
 # right click on this file and click 'Create Console for Editor'
 # type '%run word_count.py' as the input
 # you may need to use Shift+Enter to submit the input
+
+def markdown_to_text(md):
+    html = markdown.markdown(md)
+    soup = BeautifulSoup(html, features="html.parser")
+    return soup.get_text()
 
 def count_words_in_markdown():
     with open('Project.ipynb', 'r', encoding='utf-8') as f:
@@ -12,16 +21,23 @@ def count_words_in_markdown():
 
     total_words = 0
 
-    # Counter for markdown cells
     for cell in nb.cells:
         if cell.cell_type == 'markdown':
-            
-            # Skip the 'References' cell
             if '4) References' in cell.source:
                 continue
 
-            # Count #words in cell
-            words = cell.source.split()
+            text = markdown_to_text(cell.source)
+
+            filtered_lines = []
+            for line in text.splitlines():
+                # Remove lines table separators
+                if set(line.strip()) <= set('-|: '):
+                    continue
+                filtered_lines.append(line)
+
+            filtered_text = '\n'.join(filtered_lines)
+            filtered_text = filtered_text.replace('|', '')
+            words = filtered_text.split()
             total_words += len(words)
 
     print(f"Total words in markdown cells (excluding references): {total_words}")
