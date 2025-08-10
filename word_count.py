@@ -25,6 +25,8 @@ def count_words_in_markdown():
         if cell.cell_type == 'markdown':
             if '4) References' in cell.source:
                 continue
+            if 'Column name' in cell.source:
+                continue
 
             text = markdown_to_text(cell.source)
 
@@ -37,6 +39,8 @@ def count_words_in_markdown():
 
             filtered_text = '\n'.join(filtered_lines)
             filtered_text = filtered_text.replace('|', '')
+            filtered_text = filtered_text.replace('-', '')
+            print(filtered_text)
             words = filtered_text.split()
             total_words += len(words)
 
